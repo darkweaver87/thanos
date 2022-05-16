@@ -11,12 +11,10 @@ arch = $(shell uname -m)
 # Update at 2020.12.11
 ifeq ($(arch), x86_64)
     # amd64
-    SHA="fca3819d670cdaee0d785499fda202ea01c0640ca0803d26ae6dbf2a1c8c041c"
+    SHA="5f2cd8efa14d51a8bd35a9c9512a15e686506c60e688c3511f1afd247a07552d"
 else ifeq ($(arch), armv8)
     # arm64
-    SHA="5478a46f1eb37ebe414c399766f8088bc8353345602053485dd429b9a87097e5"
-else
-    echo >&2 "only support amd64 or arm64 arch" && exit 1
+    SHA="feb10e6548614dbe57d7491c91448b53c2afec2c8c25f71e5baef1b10bc154bf"
 endif
 
 # Ensure everything works even if GOPATH is not set, which is often the case.
@@ -145,7 +143,7 @@ docker: build
 	@echo ">> copying Thanos from $(PREFIX) to ./thanos_tmp_for_docker"
 	@cp $(PREFIX)/thanos ./thanos_tmp_for_docker
 	@echo ">> building docker image 'thanos'"
-	@docker build -t "thanos" --build-arg SHA=$(SHA) .
+	@docker build -t "thanos" --build-arg BASE_DOCKER_SHA=$(SHA) .
 	@rm ./thanos_tmp_for_docker
 else
 docker: docker-multi-stage
@@ -155,7 +153,7 @@ endif
 docker-multi-stage: ## Builds 'thanos' docker image using multi-stage.
 docker-multi-stage:
 	@echo ">> building docker image 'thanos' with Dockerfile.multi-stage"
-	@docker build -f Dockerfile.multi-stage -t "thanos" --build-arg SHA=$(SHA) .
+	@docker buildx build --push --platform=linux/amd64,linux/arm64 -f Dockerfile.multi-stage -t "gcr.io/traefiklabs/thanos:master-2020-12-23-3908812e" --build-arg BASE_DOCKER_SHA=$(SHA) .
 
 .PHONY: docker-push
 docker-push: ## Pushes 'thanos' docker image build to "$(DOCKER_IMAGE_REPO):$(DOCKER_IMAGE_TAG)".
