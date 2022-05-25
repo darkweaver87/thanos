@@ -153,7 +153,7 @@ endif
 docker-multi-stage: ## Builds 'thanos' docker image using multi-stage.
 docker-multi-stage:
 	@echo ">> building docker image 'thanos' with Dockerfile.multi-stage"
-	@docker buildx build --push --platform=linux/amd64,linux/arm64 -f Dockerfile.multi-stage -t "gcr.io/traefiklabs/thanos:master-2020-12-23-3908812e" --build-arg BASE_DOCKER_SHA=$(SHA) .
+	@docker buildx build --push --platform=linux/amd64,linux/arm64 -f Dockerfile.multi-stage -t "gcr.io/traefiklabs/thanos:master-2020-12-23-3908812e" .
 
 .PHONY: docker-push
 docker-push: ## Pushes 'thanos' docker image build to "$(DOCKER_IMAGE_REPO):$(DOCKER_IMAGE_TAG)".
